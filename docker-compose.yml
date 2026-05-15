@@ -1,0 +1,12 @@
+services:
+  downloader:
+    build: .
+    container_name: platzi-downloader
+
+    volumes:
+      - ./downloads:/downloads
+      - ./cookies:/cookies
+      - ./urls.txt:/app/urls.txt
+
+    stdin_open: true
+    tty: true
