@@ -1,12 +1,20 @@
 services:
   downloader:
     build: .
+
     container_name: platzi-downloader
 
     volumes:
       - ./downloads:/downloads
       - ./cookies:/cookies
-      - ./urls.txt:/app/urls.txt
+      - .:/app
 
     stdin_open: true
     tty: true
+
+    shm_size: "2gb"
+
+    environment:
+      - PYTHONUNBUFFERED=1
+
+    restart: unless-stopped

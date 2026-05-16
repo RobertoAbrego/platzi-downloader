@@ -1,3 +1,4 @@
 yt-dlp
 playwright
 requests
+beautifulsoup4
