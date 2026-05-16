@@ -1,1 +1,1 @@
-https://mediastream.platzi.com/video/h/512e13acaca1ebcd2f000279/671bd21fd2dbde000f03c6da_671bd21fd2dbde000f03c6eb.mp4/index-v1-a1.m3u8?cP=1224000&pid=6ipCPPeqOUyXPum1a3A62B2ExGERdvqa&sid=4UblUR64KSIwiM3tjGFjsicu5gviaWOK&uid=GGRkS6v3n6FN9vOZoAj12TUqJJWf2E2S&aid=512e13acaca1ebcd2f000279&fallback=none&es=mediastream.platzi.com&proto=https
+https://platzi.com/cursos/gitgithub/control-de-versiones-con-git-y-github-de/

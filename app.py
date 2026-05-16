@@ -1,6 +1,8 @@
 from yt_dlp import YoutubeDL
 from pathlib import Path
+from playwright.sync_api import sync_playwright
 import subprocess
+import requests
 
 URLS_FILE = "urls.txt"
 
@@ -34,10 +36,81 @@ def load_urls():
             if line.strip()
         ]
 
+
+def get_m3u8(platzi_url):
+
+    found = []
+
+    with sync_playwright() as p:
+
+        browser = p.chromium.launch(
+            headless=True,
+            args=["--no-sandbox"]
+        )
+
+        context = browser.new_context(
+            user_agent=HEADERS["User-Agent"]
+        )
+
+        page = context.new_page()
+
+        def handle_response(response):
+
+            url = response.url
+
+            if ".m3u8" in url:
+
+                if url not in found:
+                    found.append(url)
+
+                    print(f"M3U8 detectado: {url}")
+
+        page.on("response", handle_response)
+
+        page.goto(platzi_url)
+
+        # esperar más tiempo
+        page.wait_for_timeout(20000)
+
+        browser.close()
+
+    print(f"\nSe encontraron {len(found)} m3u8\n")
+
+    valid = []
+
+    for url in found:
+
+        try:
+
+            response = requests.get(
+                url,
+                headers=HEADERS,
+                timeout=10
+            )
+
+            if response.status_code == 200:
+
+                print(f"VALIDO: {url}")
+
+                valid.append(url)
+
+            else:
+                print(f"INVALIDO ({response.status_code}): {url}")
+
+        except Exception as e:
+            print(f"ERROR: {url} -> {e}")
+
+    return valid
+
 def main():
+
     convert_cookies()
 
-    urls = load_urls()
+    platzi_urls = load_urls()
+
+    if not platzi_urls:
+        print("No hay URLs")
+        return
 
     ydl_opts = {
         "cookiefile": COOKIE_FILE,
@@ -48,8 +121,22 @@ def main():
         "http_headers": HEADERS,
     }
 
-    with YoutubeDL(ydl_opts) as ydl:
-        ydl.download(urls)
+    for platzi_url in platzi_urls:
+
+        print(f"Abriendo: {platzi_url}")
+
+        m3u8_links = get_m3u8(platzi_url)
+
+        if not m3u8_links:
+            print("No se encontró ningún m3u8 válido")
+            continue
+
+        video_url = m3u8_links[0]
+
+        print(f"Descargando: {video_url}")
+
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([video_url])
 
 if __name__ == "__main__":
     main()
